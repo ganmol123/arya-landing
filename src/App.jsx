@@ -219,7 +219,7 @@ const AryaVidyaLanding = () => {
         .float-emoji { position: absolute; animation: float 6s ease-in-out infinite; opacity: .55; pointer-events: none; }
         .hero-blob   { position: absolute; width: 380px; height: 380px; background: linear-gradient(135deg, ${C.greenLite}, ${C.greenMid}); opacity: .16; animation: blob 12s ease-in-out infinite; pointer-events: none; }
 
-        .section-title { font-family: 'Baloo 2', cursive; font-weight: 800; font-size: clamp(1.9rem, 5vw, 2.9rem); text-align: center; margin-bottom: 12px; }
+        .section-title { font-family: 'Baloo 2', cursive; font-weight: 800; font-size: clamp(1.9rem, 5vw, 2.9rem); text-align: center; margin: 0 0 12px; }
         .section-sub   { text-align: center; color: ${C.grey}; font-size: 1.05rem; font-weight: 600; margin-bottom: 42px; }
 
         .card { background: #fff; border-radius: 24px; padding: 28px; box-shadow: 0 8px 26px rgba(45,52,54,.09); transition: transform .3s, box-shadow .3s; }
@@ -325,9 +325,9 @@ const AryaVidyaLanding = () => {
       {/* ===================== ACTIVITIES ===================== */}
       <section style={{ padding: "90px 20px", background: "#fff" }}>
         <div style={{ maxWidth: 1180, margin: "0 auto" }}>
-          <div className="section-title" style={{ color: C.green }}>
+          <h2 className="section-title" style={{ color: C.green }}>
             What We Learn Together {"\u{1F3A8}"}
-          </div>
+          </h2>
           <p className="section-sub">Every day is a new adventure</p>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(285px, 1fr))", gap: 26 }}>
@@ -361,9 +361,9 @@ const AryaVidyaLanding = () => {
       {/* ===================== FEES ===================== */}
       <section id="fees" style={{ padding: "90px 20px", background: C.greenPale }}>
         <div style={{ maxWidth: 980, margin: "0 auto" }}>
-          <div className="section-title" style={{ color: C.green }}>
+          <h2 className="section-title" style={{ color: C.green }}>
             Simple, Honest Fees {"\u{1F4B0}"}
-          </div>
+          </h2>
           <p className="section-sub">No hidden charges. Everything below is included.</p>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 26, alignItems: "start" }}>
@@ -431,9 +431,9 @@ const AryaVidyaLanding = () => {
       {/* ===================== WHY PARENTS ===================== */}
       <section style={{ padding: "90px 20px", background: "#fff" }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-          <div className="section-title" style={{ color: C.pink }}>
+          <h2 className="section-title" style={{ color: C.pink }}>
             Why Parents Choose Us {"\u{1F496}"}
-          </div>
+          </h2>
           <p className="section-sub">Little things that make a big difference</p>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(255px, 1fr))", gap: 16 }}>
@@ -462,9 +462,9 @@ const AryaVidyaLanding = () => {
       {/* ===================== VISIT / CONTACT ===================== */}
       <section id="visit" style={{ padding: "90px 20px", background: C.greenPale }}>
         <div style={{ maxWidth: 1050, margin: "0 auto" }}>
-          <div className="section-title" style={{ color: C.green }}>
+          <h2 className="section-title" style={{ color: C.green }}>
             Come Say Hello {"\u{1F44B}"}
-          </div>
+          </h2>
           <p className="section-sub">We{"\u2019"}d love to show you around</p>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 26 }}>
