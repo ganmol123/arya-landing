@@ -1,1362 +1,587 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+
+/* ------------------------------------------------------------------ *
+ * BRAND — every colour below is lifted from the locked "Tree of
+ * Learning" logo. Do not introduce colours from outside this palette.
+ * ------------------------------------------------------------------ */
+const C = {
+  green: "#4DAA57", // wordmark green (primary)
+  greenMid: "#6BCB77", // foliage
+  greenLite: "#8FE09A", // highlight foliage
+  greenPale: "#F4FBF4", // panel background
+  greenSoft: "#DFF3E3", // soft fill
+  red: "#FF6B6B", // left child's shirt
+  yellow: "#FFD93D",
+  blue: "#4D96FF", // right child's shirt
+  purple: "#9B59B6",
+  orange: "#FF9F1C",
+  pink: "#FF6B9D",
+  ink: "#2D3436",
+  grey: "#6B7280",
+};
+
+const SCHOOL = {
+  name: "Arya Vidya Play School",
+  address: "Near Power Sub Station, Hocher \u2013 834006",
+  phones: ["+91 95766 74230", "+91 95700 90086"],
+  ages: "Ages 2\u20136 Years",
+  tagline: "Where Every Child Shines!",
+};
+
+/* ------------------------------------------------------------------ *
+ * LOGO — locked "Tree of Learning" master artwork.
+ * Geometry is verbatim from the approved SVG. Do not edit.
+ * withText=false renders the mark alone (no wordmark).
+ * ------------------------------------------------------------------ */
+const TreeLogo = ({ size = 200, withText = true }) => (
+  <svg
+    viewBox={withText ? "0 0 300 300" : "45 25 210 215"}
+    width={size}
+    height={withText ? size : size * 1.02}
+    role="img"
+    aria-label={SCHOOL.name}
+  >
+    <defs>
+      <linearGradient id="treeTop" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#6BCB77" />
+        <stop offset="100%" stopColor="#4DAA57" />
+      </linearGradient>
+      <linearGradient id="trunk" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor="#8B5A2B" />
+        <stop offset="100%" stopColor="#A0522D" />
+      </linearGradient>
+    </defs>
+
+    {/* trunk */}
+    <path d="M140 180 L145 130 L155 130 L160 180 Z" fill="url(#trunk)" />
+
+    {/* foliage */}
+    <circle cx="150" cy="85" r="45" fill="url(#treeTop)" />
+    <circle cx="115" cy="105" r="32" fill="#5DBB6A" />
+    <circle cx="185" cy="105" r="32" fill="#5DBB6A" />
+    <circle cx="130" cy="75" r="28" fill="#7ED687" />
+    <circle cx="170" cy="75" r="28" fill="#7ED687" />
+    <circle cx="150" cy="55" r="22" fill="#8FE09A" />
+
+    {/* fruits */}
+    <circle cx="125" cy="70" r="8" fill="#FF6B6B" />
+    <circle cx="175" cy="70" r="8" fill="#FFD93D" />
+    <circle cx="150" cy="50" r="8" fill="#4D96FF" />
+    <circle cx="110" cy="100" r="7" fill="#9B59B6" />
+    <circle cx="190" cy="100" r="7" fill="#FF9F1C" />
+    <circle cx="140" cy="90" r="6" fill="#FF6B9D" />
+    <circle cx="160" cy="90" r="6" fill="#00D9FF" />
+
+    {/* left child */}
+    <circle cx="80" cy="175" r="12" fill="#FFEAA7" />
+    <circle cx="76" cy="173" r="2" fill="#2D3436" />
+    <circle cx="84" cy="173" r="2" fill="#2D3436" />
+    <path d="M76 179 Q80 183 84 179" stroke="#2D3436" strokeWidth="1.5" fill="none" />
+    <ellipse cx="80" cy="205" rx="12" ry="18" fill="#FF6B6B" />
+    <line x1="68" y1="200" x2="60" y2="190" stroke="#FFEAA7" strokeWidth="4" strokeLinecap="round" />
+    <line x1="92" y1="200" x2="100" y2="190" stroke="#FFEAA7" strokeWidth="4" strokeLinecap="round" />
+
+    {/* right child */}
+    <circle cx="220" cy="175" r="12" fill="#DFB48C" />
+    <circle cx="216" cy="173" r="2" fill="#2D3436" />
+    <circle cx="224" cy="173" r="2" fill="#2D3436" />
+    <path d="M216 179 Q220 183 224 179" stroke="#2D3436" strokeWidth="1.5" fill="none" />
+    <ellipse cx="220" cy="205" rx="12" ry="18" fill="#4D96FF" />
+    <line x1="208" y1="200" x2="200" y2="190" stroke="#DFB48C" strokeWidth="4" strokeLinecap="round" />
+    <line x1="232" y1="200" x2="240" y2="190" stroke="#DFB48C" strokeWidth="4" strokeLinecap="round" />
+
+    {/* ground */}
+    <ellipse cx="150" cy="225" rx="100" ry="12" fill="#90EE90" opacity="0.5" />
+
+    {withText && (
+      <>
+        <text
+          x="150"
+          y="260"
+          textAnchor="middle"
+          fontFamily="'Bubblegum Sans', 'Comic Sans MS', cursive"
+          fontSize="26"
+          fontWeight="bold"
+          fill="#4DAA57"
+        >
+          Arya Vidya
+        </text>
+        <text
+          x="150"
+          y="285"
+          textAnchor="middle"
+          fontFamily="'Poppins', sans-serif"
+          fontSize="14"
+          fill="#6B7280"
+          letterSpacing="2"
+        >
+          PLAY SCHOOL
+        </text>
+      </>
+    )}
+  </svg>
+);
+
+/* ------------------------------------------------------------------ *
+ * CONTENT
+ * ------------------------------------------------------------------ */
+const activities = [
+  { emoji: "\u{1F3A8}", title: "Art & Craft", desc: "Finger painting, clay modeling & creative expression", color: C.red, bg: "#FEE2E2" },
+  { emoji: "\u{1F3B5}", title: "Music & Dance", desc: "Rhymes, songs & joyful movement activities", color: C.purple, bg: "#F3E8FA" },
+  { emoji: "\u{1F4DA}", title: "Story Time", desc: "Magical tales that spark imagination", color: C.blue, bg: "#DBEAFE" },
+  { emoji: "\u{1F9E9}", title: "Brain Games", desc: "Puzzles & activities for growing minds", color: C.orange, bg: "#FEF3C7" },
+  { emoji: "\u{1F331}", title: "Nature Play", desc: "Garden exploration & outdoor adventures", color: C.green, bg: "#D1FAE5" },
+  { emoji: "\u{1F91D}", title: "Social Skills", desc: "Learning to share, care & make friends", color: C.pink, bg: "#FCE7F3" },
+];
+
+const features = [
+  { icon: "\u{1F3F0}", text: "Safe & Colourful Campus" },
+  { icon: "\u{1F469}\u200D\u{1F3EB}", text: "Trained & Caring Teachers" },
+  { icon: "\u{1F34E}", text: "Healthy Snacks Provided" },
+  { icon: "\u{1F4F9}", text: "CCTV Monitored Premises" },
+  { icon: "\u{1F392}", text: "Stationery & Kit Included" },
+  { icon: "\u{1F468}\u200D\u{1F469}\u200D\u{1F467}", text: "Regular Parent Updates" },
+];
+
+/* These mirror Arya-Vidya-Fee-Structure-A4-2up.pdf exactly.
+   If fees change, update BOTH the PDF and this array. */
+const fees = [
+  { name: "Tuition Fee", tag: "monthly", amount: "1,500", color: C.green },
+  { name: "Development Fee", tag: "one-time", amount: "3,000", color: C.orange },
+  { name: "Admission Fee", tag: "one-time", amount: "10,500", color: C.blue },
+];
+
+const included = [
+  { text: "2 Complimentary Uniform Sets", color: C.red },
+  { text: "Stationery & School Kit", color: C.blue },
+  { text: "First Month\u2019s Tuition Fee", color: C.purple },
+];
+
+/* Paste a Formspree form ID here to make the callback form live.
+   Free at https://formspree.io -> create form -> copy the ID (e.g. "xvgpabcd").
+   While this is empty the submit button stays disabled, so leads are never
+   silently swallowed by a form that goes nowhere. */
+const FORMSPREE_ID = "mjgnkdya";
 
 const AryaVidyaLanding = () => {
   const [formData, setFormData] = useState({ name: "", phone: "", email: "" });
-  const [submitted, setSubmitted] = useState(false);
-  const [countdown, setCountdown] = useState({
-    days: 45,
-    hours: 12,
-    mins: 30,
-    secs: 0,
-  });
+  const [status, setStatus] = useState("idle"); // idle | sending | done | error
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        let { days, hours, mins, secs } = prev;
-        secs--;
-        if (secs < 0) {
-          secs = 59;
-          mins--;
-        }
-        if (mins < 0) {
-          mins = 59;
-          hours--;
-        }
-        if (hours < 0) {
-          hours = 23;
-          days--;
-        }
-        if (days < 0) {
-          days = 0;
-          hours = 0;
-          mins = 0;
-          secs = 0;
-        }
-        return { days, hours, mins, secs };
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (!FORMSPREE_ID) return;
+
+    setStatus("sending");
+    try {
+      const res = await fetch("https://formspree.io/f/" + FORMSPREE_ID, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(formData),
+      });
+      if (!res.ok) throw new Error("bad response");
+      setStatus("done");
+    } catch {
+      setStatus("error");
+    }
   };
 
-  // Owl Logo Component
-  const OwlLogo = ({ size = 200, mobileSize = 180 }) => {
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-    
-    useEffect(() => {
-      const handleResize = () => setIsMobile(window.innerWidth < 768);
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }, []);
-    
-    const logoSize = isMobile ? mobileSize : size;
-    
-    return (
-    <svg viewBox="0 0 300 280" width={logoSize} height={logoSize * 0.93}>
-      <defs>
-        <linearGradient id="owlBody" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#8B5CF6" />
-          <stop offset="100%" stopColor="#7C3AED" />
-        </linearGradient>
-        <linearGradient id="owlBelly" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#FDF6E3" />
-          <stop offset="100%" stopColor="#F5E6D3" />
-        </linearGradient>
-      </defs>
-      <ellipse cx="150" cy="130" rx="60" ry="70" fill="url(#owlBody)" />
-      <polygon points="105,70 95,45 120,65" fill="#8B5CF6" />
-      <polygon points="195,70 205,45 180,65" fill="#8B5CF6" />
-      <ellipse cx="150" cy="145" rx="40" ry="45" fill="url(#owlBelly)" />
-      <circle cx="125" cy="110" r="22" fill="#FDF6E3" />
-      <circle cx="175" cy="110" r="22" fill="#FDF6E3" />
-      <circle cx="125" cy="110" r="15" fill="#2D3436" className="owl-eye" />
-      <circle cx="175" cy="110" r="15" fill="#2D3436" className="owl-eye" />
-      <circle cx="120" cy="105" r="5" fill="#FFF" />
-      <circle cx="170" cy="105" r="5" fill="#FFF" />
-      <polygon points="150,125 140,140 150,150 160,140" fill="#FF9F1C" />
-      <polygon points="150,48 100,68 150,88 200,68" fill="#2D3436" />
-      <rect x="145" y="40" width="10" height="20" fill="#2D3436" />
-      <rect x="140" y="35" width="20" height="8" fill="#2D3436" />
-      <line
-        x1="200"
-        y1="68"
-        x2="210"
-        y2="90"
-        stroke="#FFD93D"
-        strokeWidth="2"
-      />
-      <circle cx="210" cy="95" r="6" fill="#FFD93D" />
-      <ellipse cx="95" cy="150" rx="20" ry="35" fill="#7C3AED" />
-      <ellipse cx="205" cy="150" rx="20" ry="35" fill="#7C3AED" />
-      <rect x="115" y="165" width="70" height="10" rx="2" fill="#FF6B6B" />
-      <rect x="117" y="167" width="66" height="6" fill="#FDF6E3" />
-      <ellipse cx="130" cy="198" rx="15" ry="6" fill="#FF9F1C" />
-      <ellipse cx="170" cy="198" rx="15" ry="6" fill="#FF9F1C" />
-      <text
-        x="150"
-        y="235"
-        textAnchor="middle"
-        fontFamily="'Baloo 2', cursive"
-        fontSize="26"
-        fontWeight="bold"
-        fill="#7C3AED"
-      >
-        Arya Vidya
-      </text>
-      <text
-        x="150"
-        y="262"
-        textAnchor="middle"
-        fontFamily="'Quicksand', sans-serif"
-        fontSize="14"
-        fill="#8B5CF6"
-        fontWeight="600"
-        letterSpacing="3"
-      >
-        PLAY SCHOOL
-      </text>
-    </svg>
-    );
-  };
-
-  const activities = [
-    {
-      emoji: "🎨",
-      title: "Art & Craft",
-      desc: "Finger painting, clay modeling & creative expression",
-      color: "#FF6B6B",
-      bg: "#FEE2E2",
-    },
-    {
-      emoji: "🎵",
-      title: "Music & Dance",
-      desc: "Rhymes, songs & joyful movement activities",
-      color: "#8B5CF6",
-      bg: "#EDE9FE",
-    },
-    {
-      emoji: "📚",
-      title: "Story Time",
-      desc: "Magical tales that spark imagination",
-      color: "#3B82F6",
-      bg: "#DBEAFE",
-    },
-    {
-      emoji: "🧩",
-      title: "Brain Games",
-      desc: "Puzzles & activities for growing minds",
-      color: "#F59E0B",
-      bg: "#FEF3C7",
-    },
-    {
-      emoji: "🌱",
-      title: "Nature Play",
-      desc: "Garden exploration & outdoor adventures",
-      color: "#10B981",
-      bg: "#D1FAE5",
-    },
-    {
-      emoji: "🤝",
-      title: "Social Skills",
-      desc: "Learning to share, care & make friends",
-      color: "#EC4899",
-      bg: "#FCE7F3",
-    },
-  ];
-
-  const features = [
-    { icon: "🏰", text: "Safe & Colorful Campus" },
-    { icon: "👩‍🏫", text: "Trained & Caring Teachers" },
-    { icon: "🍎", text: "Healthy Snacks Provided" },
-    { icon: "📹", text: "CCTV Monitored Premises" },
-    { icon: "🚐", text: "Transport Facility" },
-    { icon: "👨‍👩‍👧", text: "Regular Parent Updates" },
-  ];
-
-  const testimonials = [
-    {
-      name: "Priya M.",
-      text: "Can't wait for this school to open! The curriculum looks amazing.",
-      avatar: "👩",
-    },
-    {
-      name: "Rahul S.",
-      text: "Finally a play school that focuses on holistic development!",
-      avatar: "👨",
-    },
-    {
-      name: "Anita K.",
-      text: "Love the concept! My daughter is so excited to join.",
-      avatar: "👩‍🦱",
-    },
-  ];
+  const scrollTo = (id) => () =>
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#FFF9E6",
-        overflow: "hidden",
-        position: "relative",
-      }}
-    >
+    <div style={{ fontFamily: "'Quicksand', 'Segoe UI', sans-serif", overflowX: "hidden", background: "#FFFDF7" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Fredoka+One&display=swap');
-        
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        @keyframes float { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-20px) rotate(5deg); } }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-        @keyframes wiggle { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
-        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes slideUp { 0% { transform: translateY(40px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-        @keyframes sparkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        @keyframes wave { 0%, 60%, 100% { transform: rotate(0deg); } 10%, 30% { transform: rotate(14deg); } 20% { transform: rotate(-8deg); } 40% { transform: rotate(14deg); } 50% { transform: rotate(-4deg); } }
-        @keyframes rainbow { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes blob { 0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; } 50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; } }
-        
-        .floating-emoji { position: absolute; animation: float 4s ease-in-out infinite; pointer-events: none; z-index: 1; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.15)); }
-        .section-title { font-family: 'Fredoka One', cursive; font-size: clamp(1.8rem, 5vw, 2.8rem); text-align: center; margin-bottom: 15px; }
-        .section-subtitle { font-family: 'Quicksand', sans-serif; font-size: clamp(1rem, 2.5vw, 1.2rem); text-align: center; color: #6B7280; font-weight: 600; margin-bottom: 40px; }
-        
-        .hero-blob {
-          position: absolute;
-          width: min(400px, 80vw);
-          height: min(400px, 80vw);
-          background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(236, 72, 153, 0.15));
-          animation: blob 8s ease-in-out infinite;
-          filter: blur(40px);
-        }
-        
+        @import url('https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Baloo+2:wght@600;800&family=Quicksand:wght@500;600;700&family=Poppins:wght@400;500;600&display=swap');
+
+        @keyframes float  { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(5deg); } }
+        @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes popIn  { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes pulse  { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+        @keyframes wave   { 0%,60%,100% { transform: rotate(0deg); } 10%,30% { transform: rotate(14deg); } 20% { transform: rotate(-8deg); } 40% { transform: rotate(14deg); } 50% { transform: rotate(-4deg); } }
+        @keyframes blob   { 0%,100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; } 50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; } }
+
+        .float-emoji { position: absolute; animation: float 6s ease-in-out infinite; opacity: .55; pointer-events: none; }
+        .hero-blob   { position: absolute; width: 380px; height: 380px; background: linear-gradient(135deg, ${C.greenLite}, ${C.greenMid}); opacity: .16; animation: blob 12s ease-in-out infinite; pointer-events: none; }
+
+        .section-title { font-family: 'Baloo 2', cursive; font-weight: 800; font-size: clamp(1.9rem, 5vw, 2.9rem); text-align: center; margin-bottom: 12px; }
+        .section-sub   { text-align: center; color: ${C.grey}; font-size: 1.05rem; font-weight: 600; margin-bottom: 42px; }
+
+        .card { background: #fff; border-radius: 24px; padding: 28px; box-shadow: 0 8px 26px rgba(45,52,54,.09); transition: transform .3s, box-shadow .3s; }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 16px 38px rgba(77,170,87,.20); }
+
+        .btn { font-family: 'Baloo 2', cursive; font-weight: 800; border: none; cursor: pointer; border-radius: 50px; transition: transform .2s, box-shadow .2s; }
+        .btn:hover:not(:disabled) { transform: translateY(-3px) scale(1.03); }
+        .btn:disabled { opacity: .55; cursor: not-allowed; }
+        .btn-primary { background: linear-gradient(120deg, ${C.greenMid}, ${C.green}); color: #fff; box-shadow: 0 8px 22px rgba(77,170,87,.38); }
+        .btn-ghost   { background: #fff; color: ${C.green}; border: 3px solid ${C.green}; }
+
+        .field { width: 100%; padding: 15px 20px; border: 3px solid ${C.greenSoft}; border-radius: 16px; font-size: 1rem; font-family: 'Quicksand', sans-serif; font-weight: 600; outline: none; transition: border-color .2s; box-sizing: border-box; }
+        .field:focus { border-color: ${C.green}; }
+
+        .fee-row { display: flex; justify-content: space-between; align-items: center; padding: 17px 4px; border-bottom: 1px solid #F0F3F1; }
+        .fee-tag { font-size: .74rem; font-weight: 700; margin-left: 10px; }
+
+        .tick { width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: .78rem; font-weight: 800; flex-shrink: 0; }
+
         @media (max-width: 768px) {
-          .hero-blob {
-            width: min(300px, 90vw);
-            height: min(300px, 90vw);
-          }
-        }
-        
-        .countdown-box {
-          background: white;
-          border-radius: 20px;
-          padding: clamp(12px, 3vw, 15px) clamp(18px, 4vw, 25px);
-          text-align: center;
-          box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15);
-          border: 3px solid #E9D5FF;
-          min-width: min(90px, 20vw);
-        }
-        
-        .countdown-number {
-          font-family: 'Fredoka One', cursive;
-          font-size: clamp(2rem, 5vw, 3rem);
-          background: linear-gradient(135deg, #8B5CF6, #EC4899);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-        
-        .countdown-label {
-          font-family: 'Quicksand', sans-serif;
-          font-size: 14px;
-          color: #9CA3AF;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-        }
-        
-        .activity-card {
-          background: white;
-          border-radius: 24px;
-          padding: 30px 25px;
-          text-align: center;
-          box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          border: 3px solid transparent;
-          position: relative;
-          overflow: hidden;
-        }
-        
-        .activity-card:hover {
-          transform: translateY(-12px) scale(1.02);
-          box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-        }
-        
-        .activity-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 6px;
-        }
-        
-        .feature-pill {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          background: white;
-          padding: 16px 24px;
-          border-radius: 50px;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-          font-family: 'Quicksand', sans-serif;
-          font-weight: 700;
-          font-size: 15px;
-          color: #4B5563;
-          transition: all 0.3s ease;
-          border: 2px solid #F3F4F6;
-        }
-        
-        .feature-pill:hover {
-          transform: scale(1.05);
-          border-color: #E9D5FF;
-          box-shadow: 0 8px 25px rgba(139, 92, 246, 0.2);
-        }
-        
-        .testimonial-card {
-          background: white;
-          border-radius: 24px;
-          padding: 30px;
-          box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-          position: relative;
-          border: 3px solid #F3F4F6;
-        }
-        
-        .testimonial-card::before {
-          content: '"';
-          position: absolute;
-          top: 15px;
-          left: 25px;
-          font-size: 60px;
-          font-family: Georgia, serif;
-          color: #E9D5FF;
-          line-height: 1;
-        }
-        
-        .info-card {
-          background: white;
-          border-radius: 30px;
-          padding: clamp(25px, 6vw, 40px);
-          box-shadow: 0 20px 60px rgba(139, 92, 246, 0.15);
-          border: 4px solid #E9D5FF;
-          position: relative;
-          overflow: hidden;
-        }
-        
-        @media (max-width: 768px) {
-          .info-card {
-            border-radius: 24px;
-            padding: clamp(20px, 5vw, 30px);
-          }
-        }
-        
-        .info-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 8px;
-          background: linear-gradient(90deg, #FF6B6B, #FFD93D, #6BCB77, #4D96FF, #9B59B6);
-        }
-        
-        .form-input {
-          width: 100%;
-          padding: clamp(14px, 3vw, 18px) clamp(18px, 4vw, 24px);
-          border: 3px solid #E9D5FF;
-          border-radius: 16px;
-          font-size: clamp(16px, 4vw, 18px);
-          font-family: 'Quicksand', sans-serif;
-          font-weight: 600;
-          transition: all 0.3s ease;
-          background: #FEFCFF;
-          color: #5B21B6;
-        }
-        
-        .form-input:focus {
-          outline: none;
-          border-color: #8B5CF6;
-          box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
-        }
-        
-        .form-input::placeholder { color: #C4B5FD; }
-        
-        .submit-btn {
-          width: 100%;
-          padding: clamp(16px, 4vw, 20px) clamp(30px, 6vw, 40px);
-          background: linear-gradient(135deg, #8B5CF6, #7C3AED, #6D28D9);
-          color: white;
-          border: none;
-          border-radius: 16px;
-          font-size: clamp(18px, 4vw, 20px);
-          font-family: 'Baloo 2', cursive;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
-          min-height: 48px;
-        }
-        
-        .submit-btn:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 15px 35px rgba(139, 92, 246, 0.5);
-        }
-        
-        .contact-item {
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          padding: 18px 20px;
-          background: linear-gradient(135deg, #FDF4FF, #FAF5FF);
-          border-radius: 16px;
-          transition: all 0.3s ease;
-        }
-        
-        .contact-item:hover {
-          transform: translateX(8px);
-          box-shadow: 0 4px 15px rgba(139, 92, 246, 0.15);
-        }
-        
-        .age-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          background: linear-gradient(135deg, #FEF3C7, #FDE68A);
-          padding: 12px 24px;
-          border-radius: 50px;
-          font-family: 'Baloo 2', cursive;
-          font-size: 18px;
-          color: #92400E;
-          border: 3px dashed #F59E0B;
-        }
-        
-        .scroll-indicator {
-          position: absolute;
-          bottom: 30px;
-          left: 50%;
-          transform: translateX(-50%);
-          animation: bounce 2s infinite;
+          .hero-blob { width: 220px; height: 220px; }
+          .float-emoji { font-size: 1.6rem !important; }
+          .card { padding: 22px; }
         }
       `}</style>
 
-      {/* Floating Background Blobs */}
-      <div className="hero-blob" style={{ top: "-100px", left: "-100px" }} />
-      <div
-        className="hero-blob"
-        style={{ top: "50%", right: "-150px", animationDelay: "4s" }}
-      />
-      <div
-        className="hero-blob"
-        style={{ bottom: "-100px", left: "30%", animationDelay: "2s" }}
-      />
-
-      {/* Floating Emojis - More of them! */}
-      {[
-        {
-          emoji: "🎨",
-          left: "3%",
-          top: "8%",
-          size: "2.5rem",
-          delay: 0,
-          duration: 4,
-        },
-        {
-          emoji: "🧸",
-          left: "95%",
-          top: "12%",
-          size: "3rem",
-          delay: 0.5,
-          duration: 5,
-        },
-        {
-          emoji: "🎪",
-          left: "8%",
-          top: "25%",
-          size: "2rem",
-          delay: 1,
-          duration: 4.5,
-        },
-        {
-          emoji: "🌈",
-          left: "92%",
-          top: "28%",
-          size: "2.8rem",
-          delay: 1.5,
-          duration: 5.5,
-        },
-        {
-          emoji: "⭐",
-          left: "5%",
-          top: "45%",
-          size: "2.2rem",
-          delay: 2,
-          duration: 4,
-        },
-        {
-          emoji: "🎈",
-          left: "97%",
-          top: "42%",
-          size: "2.5rem",
-          delay: 0.3,
-          duration: 5,
-        },
-        {
-          emoji: "🚀",
-          left: "4%",
-          top: "65%",
-          size: "2rem",
-          delay: 1.2,
-          duration: 4.8,
-        },
-        {
-          emoji: "🎵",
-          left: "94%",
-          top: "58%",
-          size: "2.3rem",
-          delay: 0.8,
-          duration: 5.2,
-        },
-        {
-          emoji: "📚",
-          left: "6%",
-          top: "82%",
-          size: "2.4rem",
-          delay: 1.8,
-          duration: 4.3,
-        },
-        {
-          emoji: "✏️",
-          left: "96%",
-          top: "75%",
-          size: "2rem",
-          delay: 2.2,
-          duration: 5.1,
-        },
-        {
-          emoji: "🎭",
-          left: "12%",
-          top: "92%",
-          size: "2.2rem",
-          delay: 0.6,
-          duration: 4.7,
-        },
-        {
-          emoji: "🌟",
-          left: "88%",
-          top: "88%",
-          size: "2.6rem",
-          delay: 1.4,
-          duration: 5.3,
-        },
-        {
-          emoji: "🦋",
-          left: "15%",
-          top: "15%",
-          size: "2rem",
-          delay: 2.5,
-          duration: 4.2,
-        },
-        {
-          emoji: "🌸",
-          left: "85%",
-          top: "5%",
-          size: "2.3rem",
-          delay: 0.9,
-          duration: 5.4,
-        },
-      ].map((item, i) => (
-        <div
-          key={i}
-          className="floating-emoji"
-          style={{
-            left: item.left,
-            top: item.top,
-            fontSize: item.size,
-            animationDelay: `${item.delay}s`,
-            animationDuration: `${item.duration}s`,
-          }}
-        >
-          {item.emoji}
-        </div>
-      ))}
-
-      {/* ========== HERO SECTION ========== */}
+      {/* ===================== HERO ===================== */}
       <section
         style={{
+          position: "relative",
           minHeight: "100vh",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "clamp(20px, 5vw, 40px) 20px",
-          position: "relative",
-          background:
-            "linear-gradient(180deg, #FFF9E6 0%, #FFE4F3 50%, #E4F4FF 100%)",
+          padding: "70px 20px",
+          background: `linear-gradient(160deg, #FFFDF7 0%, ${C.greenPale} 100%)`,
+          textAlign: "center",
         }}
       >
-        {/* Decorative top banner */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: "8px",
-            background:
-              "linear-gradient(90deg, #FF6B6B, #FFD93D, #6BCB77, #4D96FF, #9B59B6, #FF6B6B)",
-            backgroundSize: "200% 100%",
-            animation: "rainbow 4s linear infinite",
-          }}
-        />
+        <div className="hero-blob" style={{ top: -110, left: -110 }} />
+        <div className="hero-blob" style={{ bottom: -110, right: -110, animationDelay: "4s" }} />
 
-        {/* Logo */}
-        <div
-          style={{
-            animation:
-              "popIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards",
-          }}
-        >
-          <OwlLogo size={260} mobileSize={180} />
+        <span className="float-emoji" style={{ top: "12%", left: "8%", fontSize: "2.4rem" }}>{"\u{1F308}"}</span>
+        <span className="float-emoji" style={{ top: "20%", right: "10%", fontSize: "2.1rem", animationDelay: "1.5s" }}>{"\u2B50"}</span>
+        <span className="float-emoji" style={{ bottom: "18%", left: "12%", fontSize: "2.2rem", animationDelay: "3s" }}>{"\u{1F388}"}</span>
+        <span className="float-emoji" style={{ bottom: "24%", right: "9%", fontSize: "2rem", animationDelay: "2s" }}>{"\u{1F9F8}"}</span>
+
+        <div style={{ animation: "popIn .8s ease-out", zIndex: 1 }}>
+          <TreeLogo size={260} />
         </div>
 
-        {/* Coming Soon Text */}
         <div
           style={{
-            marginTop: 10,
             display: "inline-block",
-            background:
-              "linear-gradient(135deg, #FF6B6B, #FFD93D, #6BCB77, #4D96FF, #9B59B6)",
-            backgroundSize: "200% 200%",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            fontSize: "clamp(2.5rem, 8vw, 5rem)",
-            fontFamily: "'Fredoka One', cursive",
-            animation:
-              "rainbow 4s linear infinite, wiggle 2s ease-in-out infinite",
-            textAlign: "center",
+            background: C.yellow,
+            color: C.ink,
+            fontWeight: 800,
+            fontFamily: "'Baloo 2', cursive",
+            padding: "9px 26px",
+            borderRadius: 50,
+            marginTop: 22,
+            fontSize: "1rem",
+            letterSpacing: ".5px",
+            boxShadow: "0 6px 16px rgba(255,217,61,.45)",
+            animation: "pulse 2.4s infinite",
+            zIndex: 1,
           }}
         >
-          🎉 Coming Soon! 🎉
+          {"\u2728"} ADMISSIONS OPEN {"\u2728"}
         </div>
 
-        <p
+        <h1
           style={{
-            fontFamily: "'Quicksand', sans-serif",
-            fontSize: "clamp(1.1rem, 3vw, 1.5rem)",
-            color: "#6B7280",
-            marginTop: 10,
-            fontWeight: 600,
-            textAlign: "center",
+            fontFamily: "'Baloo 2', cursive",
+            fontWeight: 800,
+            fontSize: "clamp(2.1rem, 6vw, 3.6rem)",
+            color: C.green,
+            margin: "22px 0 10px",
+            zIndex: 1,
           }}
         >
-          A magical place where little minds grow BIG!{" "}
-          <span
-            style={{ display: "inline-block", animation: "wave 2s infinite" }}
-          >
-            👋
-          </span>
+          Learning that feels like play
+        </h1>
+
+        <p style={{ color: C.grey, fontSize: "clamp(1rem, 2.4vw, 1.25rem)", fontWeight: 600, maxWidth: 560, lineHeight: 1.65, zIndex: 1 }}>
+          A warm, joyful first classroom for little ones{" "}
+          <span style={{ display: "inline-block", animation: "wave 2.5s infinite" }}>{"\u{1F44B}"}</span>
+          <br />
+          {SCHOOL.ages} {"\u00B7"} Now enrolling in Hocher
         </p>
 
-        {/* Age Badge */}
-        <div className="age-badge" style={{ marginTop: 25 }}>
-          👶 Ages 2 to 6 Years
-        </div>
-
-        {/* Countdown Timer */}
-        <div
-          style={{
-            display: "flex",
-            gap: "clamp(10px, 3vw, 25px)",
-            marginTop: 40,
-            flexWrap: "wrap",
-            justifyContent: "center",
-          }}
-        >
-          {[
-            { value: countdown.days, label: "Days" },
-            { value: countdown.hours, label: "Hours" },
-            { value: countdown.mins, label: "Mins" },
-            { value: countdown.secs, label: "Secs" },
-          ].map((item, i) => (
-            <div key={i} className="countdown-box">
-              <div className="countdown-number">
-                {String(item.value).padStart(2, "0")}
-              </div>
-              <div className="countdown-label">{item.label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Scroll indicator */}
-        <div
-          className="scroll-indicator"
-          style={{ fontSize: "2rem", color: "#C4B5FD" }}
-        >
-          ↓
+        <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center", marginTop: 30, zIndex: 1 }}>
+          <button className="btn btn-primary" style={{ padding: "16px 38px", fontSize: "1.1rem" }} onClick={scrollTo("visit")}>
+            Book a Visit {"\u{1F392}"}
+          </button>
+          <button className="btn btn-ghost" style={{ padding: "16px 38px", fontSize: "1.1rem" }} onClick={scrollTo("fees")}>
+            See Fees {"\u{1F4B0}"}
+          </button>
         </div>
       </section>
 
-      {/* ========== ACTIVITIES SECTION ========== */}
-      <section
-        style={{
-          padding: "clamp(40px, 10vw, 80px) 20px",
-          background: "linear-gradient(180deg, #E4F4FF 0%, #FFFFFF 100%)",
-          position: "relative",
-        }}
-      >
-        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-          <div className="section-title" style={{ color: "#7C3AED" }}>
-            🌟 What We'll Learn Together 🌟
+      {/* ===================== ACTIVITIES ===================== */}
+      <section style={{ padding: "90px 20px", background: "#fff" }}>
+        <div style={{ maxWidth: 1180, margin: "0 auto" }}>
+          <div className="section-title" style={{ color: C.green }}>
+            What We Learn Together {"\u{1F3A8}"}
           </div>
-          <div className="section-subtitle">
-            Play-based learning that sparks curiosity and builds confidence
-          </div>
+          <p className="section-sub">Every day is a new adventure</p>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))",
-              gap: 25,
-            }}
-          >
-            {activities.map((activity, i) => (
-              <div
-                key={i}
-                className="activity-card"
-                style={{
-                  animationDelay: `${i * 0.1}s`,
-                  borderColor: activity.bg,
-                }}
-              >
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(285px, 1fr))", gap: 26 }}>
+            {activities.map((a, i) => (
+              <div className="card" key={i} style={{ borderTop: `6px solid ${a.color}` }}>
                 <div
                   style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: 6,
-                    background: activity.color,
-                    borderRadius: "24px 24px 0 0",
-                  }}
-                />
-                <div
-                  style={{
-                    width: 80,
-                    height: 80,
-                    background: activity.bg,
-                    borderRadius: "50%",
+                    width: 66,
+                    height: 66,
+                    borderRadius: 20,
+                    background: a.bg,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: "2.5rem",
-                    margin: "0 auto 20px",
+                    fontSize: 32,
+                    marginBottom: 16,
                   }}
                 >
-                  {activity.emoji}
+                  {a.emoji}
                 </div>
-                <h3
-                  style={{
-                    fontFamily: "'Baloo 2', cursive",
-                    fontSize: "clamp(18px, 4vw, 22px)",
-                    color: activity.color,
-                    marginBottom: 10,
-                  }}
-                >
-                  {activity.title}
+                <h3 style={{ fontFamily: "'Baloo 2', cursive", fontWeight: 800, fontSize: "1.4rem", color: a.color, marginBottom: 8 }}>
+                  {a.title}
                 </h3>
-                <p
-                  style={{
-                    fontFamily: "'Quicksand', sans-serif",
-                    fontSize: "clamp(14px, 3vw, 15px)",
-                    color: "#6B7280",
-                    fontWeight: 500,
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {activity.desc}
-                </p>
+                <p style={{ color: C.grey, fontWeight: 600, lineHeight: 1.6, margin: 0 }}>{a.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ========== WHY CHOOSE US SECTION ========== */}
-      <section
-        style={{
-          padding: "clamp(40px, 10vw, 80px) 20px",
-          background:
-            "linear-gradient(135deg, #FDF4FF 0%, #FAF5FF 50%, #F5F3FF 100%)",
-          position: "relative",
-        }}
-      >
-        {/* Decorative shapes */}
-        <div
-          style={{
-            position: "absolute",
-            top: 40,
-            left: 40,
-            width: 100,
-            height: 100,
-            background: "linear-gradient(135deg, #FFD93D, #FF9F1C)",
-            borderRadius: "30% 70% 70% 30% / 30% 30% 70% 70%",
-            opacity: 0.3,
-            animation: "blob 6s ease-in-out infinite",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: 40,
-            right: 40,
-            width: 120,
-            height: 120,
-            background: "linear-gradient(135deg, #6BCB77, #4DAA57)",
-            borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%",
-            opacity: 0.3,
-            animation: "blob 8s ease-in-out infinite reverse",
-          }}
-        />
-
-        <div
-          style={{
-            maxWidth: 1000,
-            margin: "0 auto",
-            position: "relative",
-            zIndex: 2,
-          }}
-        >
-          <div className="section-title" style={{ color: "#EC4899" }}>
-            💖 Why Parents Love Us 💖
+      {/* ===================== FEES ===================== */}
+      <section id="fees" style={{ padding: "90px 20px", background: C.greenPale }}>
+        <div style={{ maxWidth: 980, margin: "0 auto" }}>
+          <div className="section-title" style={{ color: C.green }}>
+            Simple, Honest Fees {"\u{1F4B0}"}
           </div>
-          <div className="section-subtitle">
-            Everything your little one needs to thrive
-          </div>
+          <p className="section-sub">No hidden charges. Everything below is included.</p>
 
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 20,
-              justifyContent: "center",
-            }}
-          >
-            {features.map((feature, i) => (
-              <div key={i} className="feature-pill">
-                <span style={{ fontSize: 28 }}>{feature.icon}</span>
-                {feature.text}
-              </div>
-            ))}
-          </div>
-
-          {/* Mini testimonials */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))",
-              gap: 25,
-              marginTop: 50,
-            }}
-          >
-            {testimonials.map((t, i) => (
-              <div key={i} className="testimonial-card">
-                <p
-                  style={{
-                    fontFamily: "'Quicksand', sans-serif",
-                    fontSize: 16,
-                    color: "#4B5563",
-                    fontWeight: 500,
-                    lineHeight: 1.7,
-                    marginBottom: 20,
-                    paddingTop: 20,
-                  }}
-                >
-                  {t.text}
-                </p>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <span style={{ fontSize: 36 }}>{t.avatar}</span>
-                  <span
-                    style={{
-                      fontFamily: "'Baloo 2', cursive",
-                      fontSize: 16,
-                      color: "#7C3AED",
-                    }}
-                  >
-                    {t.name}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 26, alignItems: "start" }}>
+            <div className="card" style={{ padding: 32 }}>
+              {fees.map((f, i) => (
+                <div className="fee-row" key={i}>
+                  <span style={{ fontWeight: 700, color: C.ink }}>
+                    {f.name}
+                    <span className="fee-tag" style={{ color: f.color }}>{f.tag}</span>
+                  </span>
+                  <span style={{ fontWeight: 700, fontSize: "1.15rem", color: C.ink, whiteSpace: "nowrap" }}>
+                    {"\u20B9"}{f.amount}/-
                   </span>
                 </div>
+              ))}
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  background: `linear-gradient(120deg, #EAF8EC, ${C.greenSoft})`,
+                  borderLeft: `7px solid ${C.green}`,
+                  borderRadius: 12,
+                  padding: "18px 20px",
+                  marginTop: 20,
+                }}
+              >
+                <span style={{ fontWeight: 800, color: C.ink }}>Total at Admission</span>
+                <span style={{ fontFamily: "'Bubblegum Sans', cursive", fontSize: "2rem", color: C.green }}>
+                  {"\u20B9"}15,000/-
+                </span>
+              </div>
+
+              <p style={{ fontSize: ".85rem", color: C.grey, fontWeight: 600, lineHeight: 1.55, marginTop: 16, marginBottom: 0 }}>
+                One month{"\u2019"}s tuition fee is included in the admission fee. Thereafter {"\u20B9"}1,500/- is payable monthly.
+              </p>
+            </div>
+
+            <div className="card" style={{ padding: 32 }}>
+              <h3 style={{ fontFamily: "'Bubblegum Sans', cursive", fontSize: "1.6rem", color: C.green, marginTop: 0, marginBottom: 22 }}>
+                What{"\u2019"}s Included
+              </h3>
+
+              {included.map((it, i) => (
+                <div key={i} style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 16 }}>
+                  <span className="tick" style={{ background: it.color }}>{"\u2713"}</span>
+                  <span style={{ fontWeight: 700, color: C.ink }}>{it.text}</span>
+                </div>
+              ))}
+
+              <a
+                href="/Arya-Vidya-Fee-Structure.pdf"
+                download
+                className="btn btn-primary"
+                style={{ display: "block", textAlign: "center", textDecoration: "none", padding: "15px 20px", marginTop: 26, fontSize: "1rem" }}
+              >
+                Download Fee Structure {"\u2B07\uFE0F"}
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===================== WHY PARENTS ===================== */}
+      <section style={{ padding: "90px 20px", background: "#fff" }}>
+        <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+          <div className="section-title" style={{ color: C.pink }}>
+            Why Parents Choose Us {"\u{1F496}"}
+          </div>
+          <p className="section-sub">Little things that make a big difference</p>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(255px, 1fr))", gap: 16 }}>
+            {features.map((f, i) => (
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 14,
+                  background: C.greenPale,
+                  borderRadius: 16,
+                  padding: "18px 20px",
+                  fontWeight: 700,
+                  color: C.ink,
+                }}
+              >
+                <span style={{ fontSize: 28 }}>{f.icon}</span>
+                {f.text}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ========== CONTACT & FORM SECTION ========== */}
-      <section
-        style={{
-          padding: "clamp(40px, 10vw, 80px) 20px",
-          background: "linear-gradient(180deg, #F5F3FF 0%, #FFF9E6 100%)",
-        }}
-      >
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div className="section-title" style={{ color: "#7C3AED" }}>
-            📬 Get In Touch 📬
+      {/* ===================== VISIT / CONTACT ===================== */}
+      <section id="visit" style={{ padding: "90px 20px", background: C.greenPale }}>
+        <div style={{ maxWidth: 1050, margin: "0 auto" }}>
+          <div className="section-title" style={{ color: C.green }}>
+            Come Say Hello {"\u{1F44B}"}
           </div>
-          <div className="section-subtitle">
-            Register your interest and be the first to know when we open!
-          </div>
+          <p className="section-sub">We{"\u2019"}d love to show you around</p>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))",
-              gap: "clamp(25px, 5vw, 40px)",
-            }}
-          >
-            {/* Contact Info */}
-            <div className="info-card">
-              <h3
-                style={{
-                  fontFamily: "'Baloo 2', cursive",
-                  fontSize: 26,
-                  color: "#7C3AED",
-                  marginBottom: 25,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                }}
-              >
-                <span style={{ fontSize: 32 }}>📍</span> Find Us Here!
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 26 }}>
+            <div className="card" style={{ padding: 34 }}>
+              <h3 style={{ fontFamily: "'Baloo 2', cursive", fontWeight: 800, fontSize: "1.6rem", color: C.green, marginTop: 0 }}>
+                {"\u{1F4CD}"} Find Us
               </h3>
 
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: 15 }}
-              >
-                <div className="contact-item">
-                  <div
-                    style={{
-                      width: 50,
-                      height: 50,
-                      background: "linear-gradient(135deg, #FEE2E2, #FECACA)",
-                      borderRadius: 15,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 24,
-                    }}
-                  >
-                    🏠
-                  </div>
-                  <div>
-                    <div
-                      style={{
-                        fontFamily: "'Quicksand', sans-serif",
-                        fontWeight: 700,
-                        color: "#7C3AED",
-                        fontSize: 13,
-                      }}
-                    >
-                      ADDRESS
-                    </div>
-                    <div
-                      style={{
-                        fontFamily: "'Quicksand', sans-serif",
-                        fontWeight: 600,
-                        color: "#4B5563",
-                        fontSize: 15,
-                      }}
-                    >
-                      42, Rainbow Lane, Sunshine Nagar
-                      <br />
-                      Near Happy Park, New Delhi - 110001
-                    </div>
-                  </div>
-                </div>
+              <p style={{ fontWeight: 700, color: C.ink, lineHeight: 1.7, fontSize: "1.05rem" }}>
+                {SCHOOL.name}
+                <br />
+                <span style={{ color: C.grey }}>{SCHOOL.address}</span>
+              </p>
 
-                <div className="contact-item">
-                  <div
-                    style={{
-                      width: 50,
-                      height: 50,
-                      background: "linear-gradient(135deg, #D1FAE5, #A7F3D0)",
-                      borderRadius: 15,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 24,
-                    }}
-                  >
-                    📞
-                  </div>
-                  <div>
-                    <div
-                      style={{
-                        fontFamily: "'Quicksand', sans-serif",
-                        fontWeight: 700,
-                        color: "#7C3AED",
-                        fontSize: 13,
-                      }}
-                    >
-                      PHONE
-                    </div>
-                    <div
-                      style={{
-                        fontFamily: "'Quicksand', sans-serif",
-                        fontWeight: 600,
-                        color: "#4B5563",
-                        fontSize: 15,
-                      }}
-                    >
-                      +91 98765 43210
-                    </div>
-                  </div>
-                </div>
+              <h3 style={{ fontFamily: "'Baloo 2', cursive", fontWeight: 800, fontSize: "1.6rem", color: C.green, marginTop: 28 }}>
+                {"\u{1F4DE}"} Call Us
+              </h3>
 
-                <div className="contact-item">
-                  <div
-                    style={{
-                      width: 50,
-                      height: 50,
-                      background: "linear-gradient(135deg, #DBEAFE, #BFDBFE)",
-                      borderRadius: 15,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 24,
-                    }}
-                  >
-                    ✉️
-                  </div>
-                  <div>
-                    <div
-                      style={{
-                        fontFamily: "'Quicksand', sans-serif",
-                        fontWeight: 700,
-                        color: "#7C3AED",
-                        fontSize: 13,
-                      }}
-                    >
-                      EMAIL
-                    </div>
-                    <div
-                      style={{
-                        fontFamily: "'Quicksand', sans-serif",
-                        fontWeight: 600,
-                        color: "#4B5563",
-                        fontSize: 15,
-                      }}
-                    >
-                      hello@aryavidya.play
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Map placeholder */}
-              <div
-                style={{
-                  marginTop: 25,
-                  height: 160,
-                  background: "linear-gradient(135deg, #E0E7FF, #C7D2FE)",
-                  borderRadius: 20,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "column",
-                  gap: 10,
-                  border: "3px dashed #A5B4FC",
-                }}
-              >
-                <span style={{ fontSize: 40 }}>🗺️</span>
-                <span
-                  style={{
-                    fontFamily: "'Quicksand', sans-serif",
-                    fontWeight: 700,
-                    color: "#6366F1",
-                  }}
+              {SCHOOL.phones.map((p) => (
+                <a
+                  key={p}
+                  href={"tel:" + p.replace(/\s/g, "")}
+                  style={{ display: "block", fontWeight: 700, fontSize: "1.15rem", color: C.green, textDecoration: "none", marginBottom: 8 }}
                 >
-                  Map Coming Soon!
-                </span>
+                  {p}
+                </a>
+              ))}
+
+              <div style={{ marginTop: 26, padding: "14px 18px", background: "#fff", border: `2px solid ${C.greenSoft}`, borderRadius: 14, fontWeight: 700, color: C.ink }}>
+                {"\u{1F553}"} Monday {"\u2013"} Saturday {"\u00B7"} 9:00 AM {"\u2013"} 1:00 PM
               </div>
             </div>
 
-            {/* Form */}
-            <div className="info-card">
-              <h3
-                style={{
-                  fontFamily: "'Baloo 2', cursive",
-                  fontSize: 26,
-                  color: "#7C3AED",
-                  marginBottom: 10,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                }}
-              >
-                <span style={{ fontSize: 32 }}>💌</span> Register Interest
+            <div className="card" style={{ padding: 34 }}>
+              <h3 style={{ fontFamily: "'Baloo 2', cursive", fontWeight: 800, fontSize: "1.6rem", color: C.green, marginTop: 0 }}>
+                {"\u{1F4DD}"} Request a Callback
               </h3>
-              <p
-                style={{
-                  fontFamily: "'Quicksand', sans-serif",
-                  fontSize: 15,
-                  color: "#6B7280",
-                  marginBottom: 25,
-                  fontWeight: 500,
-                }}
-              >
-                Be the first to know when admissions open!
-              </p>
 
-              {!submitted ? (
-                <form
-                  onSubmit={handleSubmit}
-                  style={{ display: "flex", flexDirection: "column", gap: 18 }}
-                >
-                  <div>
-                    <label
-                      style={{
-                        display: "block",
-                        fontFamily: "'Baloo 2', cursive",
-                        fontSize: 15,
-                        color: "#7C3AED",
-                        marginBottom: 8,
-                      }}
-                    >
-                      👶 Parent's Name
-                    </label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="Enter your name"
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      style={{
-                        display: "block",
-                        fontFamily: "'Baloo 2', cursive",
-                        fontSize: 15,
-                        color: "#7C3AED",
-                        marginBottom: 8,
-                      }}
-                    >
-                      📱 Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      className="form-input"
-                      placeholder="Enter your phone number"
-                      value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      style={{
-                        display: "block",
-                        fontFamily: "'Baloo 2', cursive",
-                        fontSize: 15,
-                        color: "#7C3AED",
-                        marginBottom: 8,
-                      }}
-                    >
-                      ✉️ Email Address
-                    </label>
-                    <input
-                      type="email"
-                      className="form-input"
-                      placeholder="Enter your email"
-                      value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
-                      required
-                    />
-                  </div>
+              {status === "done" ? (
+                <div style={{ textAlign: "center", padding: "40px 10px" }}>
+                  <div style={{ fontSize: 56, animation: "bounce 1.4s infinite" }}>{"\u{1F389}"}</div>
+                  <p style={{ fontWeight: 800, color: C.green, fontSize: "1.3rem", fontFamily: "'Baloo 2', cursive" }}>Thank you!</p>
+                  <p style={{ color: C.grey, fontWeight: 600 }}>We{"\u2019"}ll call you back very soon.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  <input
+                    className="field"
+                    placeholder="Parent's Name"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  />
+                  <input
+                    className="field"
+                    type="tel"
+                    placeholder="Phone Number"
+                    required
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  />
+                  <input
+                    className="field"
+                    type="email"
+                    placeholder="Email (optional)"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  />
 
                   <button
                     type="submit"
-                    className="submit-btn"
-                    style={{ marginTop: 10 }}
+                    className="btn btn-primary"
+                    disabled={!FORMSPREE_ID || status === "sending"}
+                    style={{ padding: "16px", fontSize: "1.1rem", marginTop: 4 }}
                   >
-                    🚀 Count Me In!
+                    {status === "sending" ? "Sending\u2026" : "Request Callback \u{1F680}"}
                   </button>
+
+                  {!FORMSPREE_ID && (
+                    <p style={{ fontSize: ".8rem", color: C.orange, fontWeight: 700, textAlign: "center", margin: 0 }}>
+                      {"\u26A0\uFE0F"} Form not connected yet {"\u2014"} add FORMSPREE_ID in App.jsx
+                    </p>
+                  )}
+                  {status === "error" && (
+                    <p style={{ fontSize: ".85rem", color: C.red, fontWeight: 700, textAlign: "center", margin: 0 }}>
+                      Something went wrong. Please call us instead.
+                    </p>
+                  )}
                 </form>
-              ) : (
-                <div
-                  style={{
-                    textAlign: "center",
-                    padding: "30px 20px",
-                    animation:
-                      "popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards",
-                  }}
-                >
-                  <div style={{ fontSize: 70, marginBottom: 15 }}>🎊</div>
-                  <h4
-                    style={{
-                      fontFamily: "'Baloo 2', cursive",
-                      fontSize: 24,
-                      color: "#059669",
-                      marginBottom: 10,
-                    }}
-                  >
-                    Yay! You're on the list!
-                  </h4>
-                  <p
-                    style={{
-                      fontFamily: "'Quicksand', sans-serif",
-                      fontSize: 15,
-                      color: "#6B7280",
-                      fontWeight: 500,
-                    }}
-                  >
-                    We'll reach out soon with exciting updates! 🌟
-                  </p>
-                  <div
-                    style={{
-                      marginTop: 20,
-                      display: "flex",
-                      justifyContent: "center",
-                      gap: 10,
-                      fontSize: 28,
-                    }}
-                  >
-                    {["⭐", "🌟", "✨", "💫", "⭐"].map((s, i) => (
-                      <span
-                        key={i}
-                        style={{
-                          animation: `sparkle 1.5s ease-in-out infinite`,
-                          animationDelay: `${i * 0.2}s`,
-                        }}
-                      >
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-                </div>
               )}
             </div>
           </div>
         </div>
       </section>
 
-      {/* ========== FOOTER ========== */}
+      {/* ===================== FOOTER ===================== */}
       <footer
         style={{
-          padding: "clamp(30px, 6vw, 50px) 20px clamp(20px, 4vw, 30px)",
-          background: "linear-gradient(135deg, #7C3AED, #8B5CF6)",
-          position: "relative",
-          overflow: "hidden",
+          background: `linear-gradient(120deg, ${C.greenMid}, ${C.green})`,
+          color: "#fff",
+          textAlign: "center",
+          padding: "50px 20px 34px",
         }}
       >
-        {/* Decorative circles */}
         <div
           style={{
-            position: "absolute",
-            top: -50,
-            left: -50,
-            width: 150,
-            height: 150,
-            background: "rgba(255,255,255,0.1)",
+            background: "#fff",
+            width: 96,
+            height: 96,
             borderRadius: "50%",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: -30,
-            right: -30,
-            width: 100,
-            height: 100,
-            background: "rgba(255,255,255,0.1)",
-            borderRadius: "50%",
-          }}
-        />
-
-        <div
-          style={{
-            maxWidth: 800,
-            margin: "0 auto",
-            textAlign: "center",
-            position: "relative",
-            zIndex: 2,
+            margin: "0 auto 18px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <div style={{ marginBottom: 25 }}>
-            <OwlLogo size={100} />
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              gap: 20,
-              marginBottom: 25,
-              flexWrap: "wrap",
-            }}
-          >
-            {["🎨", "🎪", "🎭", "🎵", "📚", "🧸", "🌈", "⭐"].map(
-              (emoji, i) => (
-                <span
-                  key={i}
-                  style={{
-                    fontSize: 28,
-                    animation: `float ${3 + i * 0.3}s ease-in-out infinite`,
-                    animationDelay: `${i * 0.2}s`,
-                  }}
-                >
-                  {emoji}
-                </span>
-              ),
-            )}
-          </div>
-
-          <p
-            style={{
-              fontFamily: "'Quicksand', sans-serif",
-              fontSize: 16,
-              color: "rgba(255,255,255,0.9)",
-              fontWeight: 600,
-              marginBottom: 10,
-            }}
-          >
-            © 2025 Arya Vidya Play School • Where Every Child Shines! ✨
-          </p>
-          <p
-            style={{
-              fontFamily: "'Quicksand', sans-serif",
-              fontSize: 14,
-              color: "rgba(255,255,255,0.6)",
-            }}
-          >
-            Made with 💜 for little learners
-          </p>
+          <TreeLogo size={72} withText={false} />
         </div>
 
-        {/* Wave decoration */}
-        <svg
-          viewBox="0 0 1440 100"
-          style={{ position: "absolute", top: 0, left: 0, right: 0 }}
-        >
-          <path
-            fill="#FFF9E6"
-            d="M0,64L60,58.7C120,53,240,43,360,48C480,53,600,75,720,80C840,85,960,75,1080,64C1200,53,1320,43,1380,37.3L1440,32L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"
-          />
-        </svg>
+        <div style={{ fontFamily: "'Bubblegum Sans', cursive", fontSize: "1.9rem", marginBottom: 6 }}>Arya Vidya</div>
+        <div style={{ letterSpacing: 3, fontSize: ".82rem", fontWeight: 600, opacity: 0.95 }}>PLAY SCHOOL</div>
+
+        <p style={{ fontFamily: "'Baloo 2', cursive", fontWeight: 800, fontSize: "1.25rem", marginTop: 22 }}>{SCHOOL.tagline}</p>
+
+        <p style={{ fontWeight: 600, opacity: 0.95, lineHeight: 1.7, marginTop: 14 }}>
+          {SCHOOL.address}
+          <br />
+          {SCHOOL.phones.join("  \u00B7  ")}
+        </p>
+
+        <p style={{ marginTop: 26, fontSize: ".85rem", opacity: 0.8, fontWeight: 600 }}>
+          {"\u00A9"} {new Date().getFullYear()} {SCHOOL.name} {"\u00B7"} {SCHOOL.ages}
+        </p>
       </footer>
     </div>
   );
