@@ -23,15 +23,15 @@ const C = {
 const SCHOOL = {
   name: "Arya Vidya Play School",
   address: "Near Power Sub Station, Hocher \u2013 834006",
-  phones: ["+91 95766 74230", "+91 95700 90086"],
+  phones: ["+91 91287 91292", "+91 95700 90086"],
   ages: "Ages 2\u20136 Years",
   tagline: "Where Every Child Shines!",
 };
 
 /* WhatsApp click-to-chat. wa.me wants country code + number, digits only
-   (no "+", no spaces). This is the first school line: +91 95766 74230.
+   (no "+", no spaces). This is the first school line: +91 91287 91292.
    To use the other number instead, swap the digits below. */
-const WHATSAPP_NUMBER = "919576674230";
+const WHATSAPP_NUMBER = "919128791292";
 const WHATSAPP_MSG = "Hi! I'd like to know more about admissions at Arya Vidya Play School.";
 const waLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MSG)}`;
 
