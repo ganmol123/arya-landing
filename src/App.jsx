@@ -24,7 +24,7 @@ const SCHOOL = {
   name: "Arya Vidya Play School",
   address: "Near Power Sub Station, Hocher \u2013 834006",
   phones: ["+91 91287 91292", "+91 95700 90086"],
-  ages: "Ages 2\u20136 Years",
+  ages: "Ages 3\u20136 Years",
   tagline: "Where Every Child Shines!",
 };
 
