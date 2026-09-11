@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python (banner artwork generator)
+__pycache__/
+*.pyc
+
+# Banner renders — regenerate with: python3 banner/build.py
+banner/out/*.png
+banner/out/logo/*.png
