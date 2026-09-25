@@ -372,6 +372,18 @@ const AryaVidyaLanding = () => {
               >
                 Download Fee Structure {"\u2B07\uFE0F"}
               </a>
+
+              <a
+                href="/Arya-Vidya-Admission-Form.pdf"
+                download
+                className="btn btn-ghost"
+                style={{ display: "block", textAlign: "center", textDecoration: "none", padding: "13px 20px", marginTop: 12, fontSize: "1rem" }}
+              >
+                Download Admission Form {"\u{1F4DD}"}
+              </a>
+              <p style={{ textAlign: "center", fontSize: ".78rem", color: C.grey, fontWeight: 600, marginTop: 10, marginBottom: 0 }}>
+                2 pages {"\u00B7"} please print on both sides
+              </p>
             </div>
           </div>
         </div>
