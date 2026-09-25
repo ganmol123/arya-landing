@@ -203,7 +203,7 @@ def design_a():
     o.append(rounded(MARGIN, band_top, card_w, card_h, 46, C["white"]))
     mark_w = 372
     o.append(logo(MARGIN + (card_w - mark_w) / 2,
-                  band_top + (card_h - mark_w * 208 / 184) / 2,
+                  band_top + (card_h - mark_w) / 2,
                   mark_w, ns=ns, with_text=False)[0])
 
     x = MARGIN + card_w + 88
@@ -272,7 +272,7 @@ def design_b():
     # ---- full logo lockup, left
     logo_w = 540
     o.append(logo(MARGIN + 26,
-                  band_top + (band_bot - band_top - logo_w * 260 / 184) / 2,
+                  band_top + (band_bot - band_top - logo_w) / 2,
                   logo_w, ns=ns)[0])
 
     x = MARGIN + 26 + logo_w + 104
@@ -335,7 +335,7 @@ def design_c():
     lcx, lw = SPLIT / 2, SPLIT - MARGIN * 2
     mark_w, mark_y = 462, 172
     o.append(logo(lcx - mark_w / 2, mark_y, mark_w, ns=ns, with_text=False)[0])
-    mark_bot = mark_y + mark_w * 208 / 184
+    mark_bot = mark_y + mark_w
 
     nm, _ = fit("Arya Vidya", "bubblegum", lw, 190)
     o.append(text_path("Arya Vidya", lcx, mark_bot + 132, font="bubblegum",
