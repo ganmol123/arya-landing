@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 
 /* ------------------------------------------------------------------ *
- * BRAND — every colour below is lifted from the locked "Tree of
- * Learning" logo. Do not introduce colours from outside this palette.
+ * BRAND — the page palette. Kept deliberately lighter and greener than
+ * the crest, which is a dense badge and would be overbearing as a full
+ * page scheme; the crest sits on the page as artwork, not as the theme.
+ * Do not introduce colours from outside this palette.
  * ------------------------------------------------------------------ */
 const C = {
-  green: "#4DAA57", // wordmark green (primary)
+  green: "#4DAA57", // primary
   greenMid: "#6BCB77", // foliage
   greenLite: "#8FE09A", // highlight foliage
   greenPale: "#F4FBF4", // panel background
@@ -18,12 +20,13 @@ const C = {
   pink: "#FF6B9D",
   ink: "#2D3436",
   grey: "#6B7280",
+  warm: "#FDF3E4", // the one callout that asks the reader to bring something
 };
 
 const SCHOOL = {
   name: "Arya Vidya Play School",
   address: "Near Power Sub Station, Hocher \u2013 834006",
-  phones: ["+91 91287 91292", "+91 95700 90086"],
+  phones: ["+91 91287 91292"],
   ages: "Ages 3\u20136 Years",
   tagline: "Where Every Child Shines!",
 };
@@ -36,97 +39,24 @@ const WHATSAPP_MSG = "Hi! I'd like to know more about admissions at Arya Vidya P
 const waLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MSG)}`;
 
 /* ------------------------------------------------------------------ *
- * LOGO — locked "Tree of Learning" master artwork.
- * Geometry is verbatim from the approved SVG. Do not edit.
- * withText=false renders the mark alone (no wordmark).
+ * CREST — the school badge. The master artwork is vector geometry in
+ * banner/emblem.py; public/logo/*.svg is generated from it with
+ * `python3 banner/build.py --logos-only`. Never hand-edit those SVGs.
+ *
+ * Served as <img>, not inlined: the ring type is converted to outlines, so
+ * the full badge is ~26 KB of path data that the browser would re-parse on
+ * every render for no benefit. mark=true is the emblem without the ring —
+ * the badge's own type is illegible much below 120px.
  * ------------------------------------------------------------------ */
-const TreeLogo = ({ size = 200, withText = true }) => (
-  <svg
-    viewBox={withText ? "0 0 300 300" : "45 25 210 215"}
+const Crest = ({ size = 220, mark = false }) => (
+  <img
+    src={mark ? "/logo/arya-vidya-logo-mark.svg" : "/logo/arya-vidya-logo.svg"}
     width={size}
-    height={withText ? size : size * 1.02}
-    role="img"
-    aria-label={SCHOOL.name}
-  >
-    <defs>
-      <linearGradient id="treeTop" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stopColor="#6BCB77" />
-        <stop offset="100%" stopColor="#4DAA57" />
-      </linearGradient>
-      <linearGradient id="trunk" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stopColor="#8B5A2B" />
-        <stop offset="100%" stopColor="#A0522D" />
-      </linearGradient>
-    </defs>
-
-    {/* trunk */}
-    <path d="M140 180 L145 130 L155 130 L160 180 Z" fill="url(#trunk)" />
-
-    {/* foliage */}
-    <circle cx="150" cy="85" r="45" fill="url(#treeTop)" />
-    <circle cx="115" cy="105" r="32" fill="#5DBB6A" />
-    <circle cx="185" cy="105" r="32" fill="#5DBB6A" />
-    <circle cx="130" cy="75" r="28" fill="#7ED687" />
-    <circle cx="170" cy="75" r="28" fill="#7ED687" />
-    <circle cx="150" cy="55" r="22" fill="#8FE09A" />
-
-    {/* fruits */}
-    <circle cx="125" cy="70" r="8" fill="#FF6B6B" />
-    <circle cx="175" cy="70" r="8" fill="#FFD93D" />
-    <circle cx="150" cy="50" r="8" fill="#4D96FF" />
-    <circle cx="110" cy="100" r="7" fill="#9B59B6" />
-    <circle cx="190" cy="100" r="7" fill="#FF9F1C" />
-    <circle cx="140" cy="90" r="6" fill="#FF6B9D" />
-    <circle cx="160" cy="90" r="6" fill="#00D9FF" />
-
-    {/* left child */}
-    <circle cx="80" cy="175" r="12" fill="#FFEAA7" />
-    <circle cx="76" cy="173" r="2" fill="#2D3436" />
-    <circle cx="84" cy="173" r="2" fill="#2D3436" />
-    <path d="M76 179 Q80 183 84 179" stroke="#2D3436" strokeWidth="1.5" fill="none" />
-    <ellipse cx="80" cy="205" rx="12" ry="18" fill="#FF6B6B" />
-    <line x1="68" y1="200" x2="60" y2="190" stroke="#FFEAA7" strokeWidth="4" strokeLinecap="round" />
-    <line x1="92" y1="200" x2="100" y2="190" stroke="#FFEAA7" strokeWidth="4" strokeLinecap="round" />
-
-    {/* right child */}
-    <circle cx="220" cy="175" r="12" fill="#DFB48C" />
-    <circle cx="216" cy="173" r="2" fill="#2D3436" />
-    <circle cx="224" cy="173" r="2" fill="#2D3436" />
-    <path d="M216 179 Q220 183 224 179" stroke="#2D3436" strokeWidth="1.5" fill="none" />
-    <ellipse cx="220" cy="205" rx="12" ry="18" fill="#4D96FF" />
-    <line x1="208" y1="200" x2="200" y2="190" stroke="#DFB48C" strokeWidth="4" strokeLinecap="round" />
-    <line x1="232" y1="200" x2="240" y2="190" stroke="#DFB48C" strokeWidth="4" strokeLinecap="round" />
-
-    {/* ground */}
-    <ellipse cx="150" cy="225" rx="100" ry="12" fill="#90EE90" opacity="0.5" />
-
-    {withText && (
-      <>
-        <text
-          x="150"
-          y="260"
-          textAnchor="middle"
-          fontFamily="'Bubblegum Sans', 'Comic Sans MS', cursive"
-          fontSize="26"
-          fontWeight="bold"
-          fill="#4DAA57"
-        >
-          Arya Vidya
-        </text>
-        <text
-          x="150"
-          y="285"
-          textAnchor="middle"
-          fontFamily="'Poppins', sans-serif"
-          fontSize="14"
-          fill="#6B7280"
-          letterSpacing="2"
-        >
-          PLAY SCHOOL
-        </text>
-      </>
-    )}
-  </svg>
+    height={size}
+    alt={mark ? "" : SCHOOL.name}
+    aria-hidden={mark || undefined}
+    style={{ display: "block" }}
+  />
 );
 
 /* ------------------------------------------------------------------ *
@@ -159,8 +89,9 @@ const features = [
   { icon: "\u{1F468}\u200D\u{1F469}\u200D\u{1F467}", text: "Regular Parent Updates" },
 ];
 
-/* These mirror Arya-Vidya-Fee-Structure-A4-2up.pdf exactly.
-   If fees change, update BOTH the PDF and this array. */
+/* These mirror the printed fee slip exactly. The slip has its own copy of
+   the numbers in banner/fees.py — if fees change, edit both, then re-run
+   `python3 banner/build.py --fees-only`. */
 const fees = [
   { name: "Tuition Fee", tag: "monthly", amount: "1,500", color: C.green },
   { name: "Development Fee", tag: "one-time", amount: "3,000", color: C.orange },
@@ -269,7 +200,7 @@ const AryaVidyaLanding = () => {
         <span className="float-emoji" style={{ bottom: "24%", right: "9%", fontSize: "2rem", animationDelay: "2s" }}>{"\u{1F9F8}"}</span>
 
         <div style={{ animation: "popIn .8s ease-out", zIndex: 1 }}>
-          <TreeLogo size={260} />
+          <Crest size={260} />
         </div>
 
         <div
@@ -401,6 +332,24 @@ const AryaVidyaLanding = () => {
               <p style={{ fontSize: ".85rem", color: C.grey, fontWeight: 600, lineHeight: 1.55, marginTop: 16, marginBottom: 0 }}>
                 One month{"\u2019"}s tuition fee is included in the admission fee. Thereafter {"\u20B9"}1,500/- is payable monthly.
               </p>
+
+              {/* Mirrors the same strip on the printed slip (banner/fees.py, BRING). */}
+              <div
+                style={{
+                  background: C.warm,
+                  borderLeft: `7px solid ${C.orange}`,
+                  borderRadius: 12,
+                  padding: "14px 18px",
+                  marginTop: 18,
+                  fontSize: ".88rem",
+                  lineHeight: 1.55,
+                }}
+              >
+                <span style={{ fontWeight: 800, color: C.ink }}>Please bring: </span>
+                <span style={{ fontWeight: 700, color: C.grey }}>
+                  Guardian{"\u2019"}s Aadhaar or other photo ID {"\u00B7"} Student{"\u2019"}s date of birth
+                </span>
+              </div>
             </div>
 
             <div className="card" style={{ padding: 32 }}>
@@ -591,7 +540,7 @@ const AryaVidyaLanding = () => {
             justifyContent: "center",
           }}
         >
-          <TreeLogo size={72} withText={false} />
+          <Crest size={72} mark />
         </div>
 
         <div style={{ fontFamily: "'Bubblegum Sans', cursive", fontSize: "1.9rem", marginBottom: 6 }}>Arya Vidya</div>

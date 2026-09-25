@@ -8,6 +8,7 @@ outlines.
 """
 
 import functools
+import math
 import os
 
 import uharfbuzz as hb
@@ -175,3 +176,64 @@ def fit(text, font, max_width, size, letter_spacing=0, min_size=8):
 def cap_height(text, font, size, letter_spacing=0):
     """Ink height above the baseline -- what a driver actually perceives."""
     return -bbox(text, font, size, letter_spacing)[1]
+
+
+def arc_text(text, cx, cy, radius, mid=0.0, font="baloo-extrabold", size=100,
+             fill="#000", letter_spacing=0, flip=False, extra=""):
+    """One <path> holding `text` set around a circle.
+
+    `mid` is where the middle of the string sits, in degrees clockwise from
+    12 o'clock. `radius` is the baseline circle. flip=False puts the glyphs
+    outside that circle (top-of-badge text, tops pointing out); flip=True
+    puts them inside it (bottom-of-badge text, tops pointing at the centre)
+    and still reads left to right.
+
+    Each glyph is rotated about its own advance centre rather than its
+    origin -- at badge sizes one glyph spans several degrees, and hanging
+    them off their left edge visibly fans the wide ones apart.
+    """
+    runs, width, glyphset, scale = _shape(font, text, size, letter_spacing)
+    if not runs:
+        return ""
+
+    # per-glyph advance, recovered from the gaps between pen positions
+    pens = [r[1] for r in runs] + [width]
+    chunks = []
+    for i, (glyph_name, gx, gy) in enumerate(runs):
+        pen = SVGPathPen(glyphset, ntos=lambda v: f"{v:.2f}")
+        glyphset[glyph_name].draw(TransformPen(pen, Transform(scale, 0, 0,
+                                                              -scale, 0, -gy)))
+        d = pen.getCommands()
+        if not d:
+            continue
+        advance = pens[i + 1] - pens[i]
+        offset = gx + advance / 2 - width / 2       # along the arc, from centre
+        sweep = math.degrees(offset / radius)
+        a = mid - sweep if flip else mid + sweep
+        rad = math.radians(a)
+        px = cx + radius * math.sin(rad)
+        py = cy - radius * math.cos(rad)
+        rot = a + 180 if flip else a
+        chunks.append(
+            f'<g transform="translate({px:.2f},{py:.2f}) rotate({rot:.2f}) '
+            f'translate({-advance / 2:.2f},0)"><path d="{d}"/></g>')
+
+    return f'<g fill="{fill}"{" " + extra if extra else ""}>{"".join(chunks)}</g>'
+
+
+def arc_span(text, font="baloo-extrabold", size=100, letter_spacing=0,
+             radius=100):
+    """Degrees of arc `text` occupies at `radius` -- for fitting to a band."""
+    return math.degrees(measure(text, font, size, letter_spacing) / radius)
+
+
+def fit_arc(text, font, degrees, radius, size, letter_spacing=0):
+    """Letter-spacing that makes `text` span exactly `degrees` at `radius`.
+
+    Badge type is set to fill its band edge to edge, so the tracking is
+    derived from the gap rather than dialled in by hand.
+    """
+    target = math.radians(degrees) * radius
+    base = measure(text, font, size, 0)
+    n = max(1, len(text) - 1)
+    return (target - base) / n

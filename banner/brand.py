@@ -1,11 +1,11 @@
-"""Brand constants + the locked "Tree of Learning" logo as reusable vector.
+"""Brand constants, plus the crest placed for banner artwork.
 
-Colours and logo geometry are lifted verbatim from src/App.jsx. Nothing here
-invents a colour or nudges a coordinate -- the banner has to match the sign
-on the gate and the website.
+The palette is the website's; the crest's own colours are in emblem.C.
+Nothing here invents a colour or nudges a coordinate -- the banner has to
+match the sign on the gate and the website.
 """
 
-from typeset import text_path
+import emblem
 
 # ---------------------------------------------------------------- palette
 C = {
@@ -43,79 +43,23 @@ SCHOOL = {
 
 
 # ------------------------------------------------------------------ logo
+# The crest itself lives in emblem.py -- one master for the website, the
+# favicons, the fee slip and these banners. brand.py only places it.
 def logo_defs(ns):
-    """Gradient defs for the logo. `ns` namespaces the ids per-file."""
-    return f"""
-    <linearGradient id="{ns}TreeTop" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#6BCB77"/><stop offset="100%" stop-color="#4DAA57"/>
-    </linearGradient>
-    <linearGradient id="{ns}Trunk" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#8B5A2B"/><stop offset="100%" stop-color="#A0522D"/>
-    </linearGradient>"""
+    """Kept for the designs' <defs> block. The crest uses flat colour, so
+    there is nothing to namespace any more -- the tree logo's gradients
+    were the only reason `ns` existed."""
+    return ""
 
 
-def _mark_body(ns):
-    """Tree + two children + ground, in the logo's native 300x300 space."""
-    return f"""
-    <path d="M140 180 L145 130 L155 130 L160 180 Z" fill="url(#{ns}Trunk)"/>
-    <circle cx="150" cy="85" r="45" fill="url(#{ns}TreeTop)"/>
-    <circle cx="115" cy="105" r="32" fill="#5DBB6A"/>
-    <circle cx="185" cy="105" r="32" fill="#5DBB6A"/>
-    <circle cx="130" cy="75" r="28" fill="#7ED687"/>
-    <circle cx="170" cy="75" r="28" fill="#7ED687"/>
-    <circle cx="150" cy="55" r="22" fill="#8FE09A"/>
-    <circle cx="125" cy="70" r="8" fill="#FF6B6B"/>
-    <circle cx="175" cy="70" r="8" fill="#FFD93D"/>
-    <circle cx="150" cy="50" r="8" fill="#4D96FF"/>
-    <circle cx="110" cy="100" r="7" fill="#9B59B6"/>
-    <circle cx="190" cy="100" r="7" fill="#FF9F1C"/>
-    <circle cx="140" cy="90" r="6" fill="#FF6B9D"/>
-    <circle cx="160" cy="90" r="6" fill="#00D9FF"/>
-    <circle cx="80" cy="175" r="12" fill="#FFEAA7"/>
-    <circle cx="76" cy="173" r="2" fill="#2D3436"/>
-    <circle cx="84" cy="173" r="2" fill="#2D3436"/>
-    <path d="M76 179 Q80 183 84 179" stroke="#2D3436" stroke-width="1.5" fill="none"/>
-    <ellipse cx="80" cy="205" rx="12" ry="18" fill="#FF6B6B"/>
-    <line x1="68" y1="200" x2="60" y2="190" stroke="#FFEAA7" stroke-width="4" stroke-linecap="round"/>
-    <line x1="92" y1="200" x2="100" y2="190" stroke="#FFEAA7" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="220" cy="175" r="12" fill="#DFB48C"/>
-    <circle cx="216" cy="173" r="2" fill="#2D3436"/>
-    <circle cx="224" cy="173" r="2" fill="#2D3436"/>
-    <path d="M216 179 Q220 183 224 179" stroke="#2D3436" stroke-width="1.5" fill="none"/>
-    <ellipse cx="220" cy="205" rx="12" ry="18" fill="#4D96FF"/>
-    <line x1="208" y1="200" x2="200" y2="190" stroke="#DFB48C" stroke-width="4" stroke-linecap="round"/>
-    <line x1="232" y1="200" x2="240" y2="190" stroke="#DFB48C" stroke-width="4" stroke-linecap="round"/>
-    <ellipse cx="150" cy="225" rx="100" ry="12" fill="#90EE90" opacity="0.5"/>"""
+def logo(x, y, width, ns="lg", with_text=True):
+    """Place the crest with its top-left at (x, y), scaled to `width`.
 
-
-def _wordmark(green=C["green"], grey=C["grey"]):
-    """"Arya Vidya" / "PLAY SCHOOL" at the master artwork's own sizes."""
-    return (
-        text_path("Arya Vidya", 150, 260, font="bubblegum", size=26,
-                  fill=green, anchor="middle", track=False)
-        + text_path("PLAY SCHOOL", 150, 285, font="poppins", size=14,
-                    fill=grey, anchor="middle", letter_spacing=2, track=False)
-    )
-
-
-# The mark alone occupies x 58..242, y 30..238 of the 300x300 artboard.
-MARK_BOX = (58, 30, 184, 208)      # x, y, w, h
-FULL_BOX = (58, 30, 184, 260)      # mark + wordmark, down to the tagline
-
-
-def logo(x, y, width, ns="lg", with_text=True, green=None, grey=None):
-    """Place the logo with its top-left at (x, y), scaled to `width`.
-
-    Returns (svg, height) so callers can stack things underneath it.
+    Returns (svg, height) so callers can stack things underneath it. The
+    crest already carries the school's name, so with_text=False gives the
+    emblem alone -- what a design uses when it sets the name itself.
     """
-    bx, by, bw, bh = FULL_BOX if with_text else MARK_BOX
-    s = width / bw
-    body = _mark_body(ns)
-    if with_text:
-        body += _wordmark(green or C["green"], grey or C["grey"])
-    g = (f'<g transform="translate({x:.2f},{y:.2f}) scale({s:.5f}) '
-         f'translate({-bx},{-by})">{body}</g>')
-    return g, bh * s
+    return emblem.place(x, y, width, full=with_text), width
 
 
 # ------------------------------------------------------- decorative bits
