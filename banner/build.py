@@ -6,6 +6,7 @@
     python3 banner/build.py --logos-only  # just the crest: site + favicons
     python3 banner/build.py --fees-only   # just the fee slip PDFs
     python3 banner/build.py --form-only   # just the admission form PDF
+    python3 banner/build.py --patches-only  # crest patches to paste over old logos
 
 It also re-cuts the crest into public/logo/ and the two favicons, so the
 site, the banners and the print files can never drift apart -- emblem.py is
@@ -37,6 +38,7 @@ import admission  # noqa: E402
 import designs as _designs  # noqa: E402
 import emblem  # noqa: E402
 import fees  # noqa: E402
+import patches  # noqa: E402
 import typeset  # noqa: E402
 from designs import DESIGNS, MARGIN, W, H  # noqa: E402
 
@@ -245,6 +247,17 @@ def build_admission_form():
           f"(A4, 2 sides, {s1:.0f}/{s2:.0f}pt spare)")
 
 
+def build_crest_patches():
+    """A4 sheets of the crest, cut up and pasted over the old tree logo on
+    stationery printed before the change. One page per old-logo size, so
+    this stays in banner/out/ -- it is not something the site serves."""
+    dest = os.path.join(OUT, "Arya-Vidya-Crest-Patches.pdf")
+    render_pdf_pages([patches.sheet_svg(d) for d in patches.SIZES], dest,
+                     size_in=A4_IN)
+    per = ", ".join(f"{d}mm x{n}" for d, n in patches.counts().items())
+    print(f"  patches:     out/Arya-Vidya-Crest-Patches.pdf (A4, {per})")
+
+
 def build_social_png():
     """The og:image. Flat white behind it -- a transparent share card goes
     black on half the apps that render one, and 3000 px is 2 MB for nothing.
@@ -304,10 +317,12 @@ def main():
                     help="rebuild only the fee slip PDFs, then stop")
     ap.add_argument("--form-only", action="store_true",
                     help="rebuild only the admission form PDF, then stop")
+    ap.add_argument("--patches-only", action="store_true",
+                    help="rebuild only the crest patch sheets, then stop")
     args = ap.parse_args()
 
-    if ((args.logos_only or args.fees_only or args.form_only)
-            and not os.path.exists(CHROME)):
+    if ((args.logos_only or args.fees_only or args.form_only
+            or args.patches_only) and not os.path.exists(CHROME)):
         sys.exit(f"Google Chrome not found at {CHROME} — needed to write "
                  f"the PDFs and PNGs.")
     if not args.svg_only and not os.path.exists(CHROME):
@@ -320,6 +335,9 @@ def main():
         return
     if args.form_only:
         build_admission_form()
+        return
+    if args.patches_only:
+        build_crest_patches()
         return
     write_logo_lockups()
     if args.logos_only:
@@ -361,6 +379,7 @@ def main():
         build_social_png()
         build_fee_slip()
         build_admission_form()
+        build_crest_patches()
         build_logo_pack()
 
     with open(os.path.join(OUT, "index.html"), "w") as fh:

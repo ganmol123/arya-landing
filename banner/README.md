@@ -9,6 +9,7 @@ python3 banner/build.py               # everything
 python3 banner/build.py --svg-only    # fast loop while designing a banner
 python3 banner/build.py --logos-only  # crest lockups, favicons, og:image
 python3 banner/build.py --fees-only   # the two fee slip PDFs
+python3 banner/build.py --patches-only  # crest patches for old stationery
 ```
 
 Banners land in `banner/out/`; open `banner/out/index.html` to compare the
@@ -104,6 +105,24 @@ stage; it covers ages 6–14.
 
 None of this is legal advice — have someone qualified read the declarations
 before printing a large batch.
+
+## Crest patches
+
+Some stationery went out printed with the old tree logo.
+`banner/out/Arya-Vidya-Crest-Patches.pdf` tiles the new crest in a grid of
+squares so each old logo can be covered by one cut-out square rather than the
+stationery being thrown away.
+
+The old circle was never measured, so the PDF has **one A4 page per size**:
+35, 40, 45 and 50 mm (`SIZES` in `patches.py`). Measure the old logo across
+with a ruler and print the nearest page that is not smaller. On that page the
+crest prints at that diameter, with 2 mm of white on every side of the square
+to hide the old outline and absorb a crooked cut.
+
+Print at **100% / Actual size**. "Fit to page" shrinks the sheet a few
+percent and the square stops covering the old circle; the 50 mm bar at the
+foot of each page is there to catch that with a ruler. Self-adhesive A4
+sticker paper saves the glue.
 
 ## The three banner options
 
